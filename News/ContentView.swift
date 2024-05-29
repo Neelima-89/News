@@ -8,9 +8,22 @@
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject var newsProvider: LatestNewsProvider
+    @State var isPresented = false
+    let client = NewsClient()
     var body: some View {
-        Text("Hello, world!")
-            .padding()
+        List {
+            ForEach(newsProvider.headlines) { headline in
+                NewsHeadlineListRow(headline: headline)
+            }
+            .listRowSeparatorTint(.gray)
+        }
+        .refreshable {
+            await newsProvider.fetchLatestHeadlines()
+        }
+        .task {
+            await newsProvider.fetchLatestHeadlines()
+        }
     }
 }
 
